@@ -3,8 +3,17 @@ export const plugins = {
 	count: {
 	name: `count`,
 	author: `Jesse Traynham`,
-	version: `1.0.0`,
+	category: `Array/Text`,
 	description: `Counts the number of elements in an array, characters in a string, or occurrences of a specified value in the input.`,
+	kind: `single`,
+	version: `1.0.0`,
+	docs: {
+	content: [{
+	name: `content`,
+	type: `any`,
+	required: true,
+	description: `The input where the count is performed. This can be a string or an array.`
+}],
 	examples: [{
 	input: `[count 'This is 10']`,
 	output: `10`,
@@ -18,22 +27,15 @@ export const plugins = {
 	output: `2`,
 	note: `Counts the occurrences of the letter "t" in the string.`
 }],
-	syntax: `[count property], [count(query) property]`,
-	type: [`string`, `array`],
-	category: `Array/Text`,
-	kind: `single`,
 	params: [{
 	name: `query`,
 	type: `string`,
 	required: false,
 	description: `The specific value to count in the input. If not provided, all elements or characters are counted.`
 }],
-	content: [{
-	name: `content`,
-	type: `any`,
-	required: true,
-	description: `The input where the count is performed. This can be a string or an array.`
-}],
+	syntax: `[count property], [count(query) property]`,
+	type: [`string`, `array`]
+},
 	processor(req) {
 		
 		let q = req.params[0]
@@ -62,9 +64,8 @@ export const plugins = {
 	category: `Array/Text`,
 	description: `Joins the elements of an array with a specified separator. If no separator is specified, the elements are joined with a comma followed by a space.`,
 	kind: `single`,
-	syntax: `[join(delimiter) array]`,
-	type: [`array`],
 	version: `1.0.0`,
+	docs: {
 	content: [{
 	name: `content`,
 	type: `array`,
@@ -77,19 +78,10 @@ export const plugins = {
 	required: false,
 	description: `The string used to separate the elements in the array. If not provided, a comma and a space are used as the default.`
 }],
-	examples: [{
-	input: `[join('-') myNumbers]`,
-	output: `1-2-3`,
-	note: `Joins an array of numbers with a hyphen, assuming payload is \{myNumbers: [1, 2, 3]}`
-}, {
-	input: `[join(', ') myFruit]`,
-	output: `Apple, Orange, Grape`,
-	note: `Joins an array of fruits with a comma and a space, assuming payload is {myFruit: ['Apple', 'Orange', 'Grape']}`
-}, {
-	input: `[join('') myFruit]`,
-	output: `AppleOrangeGrape`,
-	note: `Joins an array of fruits with no separator, assuming payload is {myFruit: ['Apple', 'Orange', 'Grape']}`
-}],
+	examples: [],
+	syntax: `[join(delimiter) array]`,
+	type: [`array`]
+},
 	settings: {
 	delimiter: `, `
 },
@@ -109,28 +101,19 @@ export const plugins = {
 	length: {
 	name: `length`,
 	author: `Jesse Traynham`,
-	description: `Returns the length of a string or the number of elements in an array.`,
-	version: `1.0.0`,
 	category: `Array/Text`,
+	description: `Returns the length of a string or the number of elements in an array.`,
 	kind: `single`,
-	syntax: `[length: property.path]`,
+	version: `1.0.0`,
+	docs: {
 	content: [{
 	name: `content`,
 	type: [`string`, `array`],
 	required: true,
 	description: `Content (string or array) whose length is to be determined.`
 }],
-	examples: [{
-	payload: `{ text: 'This is 10' }`,
-	input: `[length: text]`,
-	output: `10`,
-	note: `The content is a string of length 10.`
-}, {
-	payload: `{ array: ['one', 'two', 'three', 'four', 'five'] }`,
-	input: `[length: array]`,
-	output: `5`,
-	note: `The content is an array of length 5.`
-}],
+	syntax: `[length: property.path]`
+},
 	processor(req) {
 		if(!req.content){ return 0 }
 		return req.content.length;
@@ -338,13 +321,7 @@ export const plugins = {
 }],
 	processor(request) {
 		
-//		console.log('REQUEST::', request)
-		
 		let { cargo } = request
-		
-		// console.log('KEYS::', Object.keys(request))
-//		console.log('CARGO::', cargo)
-//		console.log('CONTENT::', request.content)
 		
 		let conditionIsTrue
 		
@@ -693,10 +670,9 @@ export const plugins = {
 	name: `ignore`,
 	author: `Jesse Traynham`,
 	category: `Formatting`,
-	aliases: [`md`],
 	description: `Ignores the content and returns it as a raw string, escaping any special characters.`,
 	kind: `container`,
-	syntax: `[ignore] Your raw content here [/ignore]`,
+	syntax: `[ignore] Your raw contenthere [/ignore]`,
 	version: `1.0.0`,
 	content: [{
 	name: `content`,
@@ -714,85 +690,6 @@ export const plugins = {
 }],
 	variant: `original`
 },
-	md: {
-	name: `md`,
-	aliases: [`md`],
-	author: `Jesse Traynham`,
-	browserStyles: [`https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css`],
-	browserScripts: [`https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js`, `https://cdn.jsdelivr.net/npm/markdown-it-attrs@4.3.1/markdown-it-attrs.browser.min.js`, `https://cdn.jsdelivr.net/npm/prismjs@latest/prism.min.js`],
-	category: `Formatting`,
-	description: `Renders markdown content into HTML with additional support for attributes and Prism syntax highlighting.`,
-	docs: {
-	flags: {
-	keepTabs: `By default, tabs will be removed. Use this flag to leave tabs in.`
-},
-	content: [{
-	name: `content`,
-	type: `string`,
-	required: true,
-	description: `Markdown content to be rendered into HTML.`
-}],
-	examples: [{
-	payload: `{ }`,
-	template: `[markdown]# Header <br> **Bold Text** [/markdown]`,
-	output: `<h1>Header</h1> <p><strong>Bold Text</strong></p>`,
-	note: `Markdown content is converted to HTML.`
-}],
-	syntax: `[markdown] Your **markdown** text here [/markdown]`
-},
-	kind: `container`,
-	version: `1.0.0`,
-	_md: null,
-	async onStartup() {
-		
-		const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
-			
-		if (isNode) {
-			
-			const { default: MarkdownIt } = await import('markdown-it');
-			const { default: markdownItAttrs } = await import('markdown-it-attrs');
-			const { default: prism } = await import('markdown-it-prism');
-			
-			this._md = await MarkdownIt({ html: true })
-				.use(markdownItAttrs)
-				.use(prism);
-			
-		} else {
-			
-			// Will be called after all scripts are loaded!
-			this._md = window.markdownit()
-				.use(window.markdownItAttrs)
-			
-		}
-
-	},
-	onRender() {
-	
-		if (window.Prism && typeof window.Prism.highlightAll === 'function') {
-			window.Prism.highlightAll();
-		}
-		
-	},
-	processor(req) {
-		
-		if(!req.cargo?.flags?.includes('keepTabs')){
-			req.content = req.content.replace(/\t/g, '')
-		}
-		
-		let output = req.engine.process(req.content, req.payload)
-		
-		output = req.engine.runPlugin('unescape_delimiters', { content: output })
-		
-		output = this._md.render(output)
-		
-		output = req.engine.runPlugin('escape_delimiters', { content: output })
-		
-		return output;
-		
-	},
-	variant: `alias`,
-	alias: `md`
-},
 	markdown: {
 	name: `markdown`,
 	aliases: [`md`],
@@ -801,6 +698,8 @@ export const plugins = {
 	browserScripts: [`https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js`, `https://cdn.jsdelivr.net/npm/markdown-it-attrs@4.3.1/markdown-it-attrs.browser.min.js`, `https://cdn.jsdelivr.net/npm/prismjs@latest/prism.min.js`],
 	category: `Formatting`,
 	description: `Renders markdown content into HTML with additional support for attributes and Prism syntax highlighting.`,
+	kind: `container`,
+	version: `1.0.0`,
 	docs: {
 	flags: {
 	keepTabs: `By default, tabs will be removed. Use this flag to leave tabs in.`
@@ -819,8 +718,6 @@ export const plugins = {
 }],
 	syntax: `[markdown] Your **markdown** text here [/markdown]`
 },
-	kind: `container`,
-	version: `1.0.0`,
 	_md: null,
 	async onStartup() {
 		
@@ -860,16 +757,87 @@ export const plugins = {
 		
 		let output = req.engine.process(req.content, req.payload)
 		
-		output = req.engine.runPlugin('unescape_delimiters', { content: output })
-		
 		output = this._md.render(output)
-		
-		output = req.engine.runPlugin('escape_delimiters', { content: output })
 		
 		return output;
 		
 	},
 	variant: `original`
+},
+	md: {
+	name: `md`,
+	aliases: [`md`],
+	author: `Jesse Traynham`,
+	browserStyles: [`https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css`],
+	browserScripts: [`https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js`, `https://cdn.jsdelivr.net/npm/markdown-it-attrs@4.3.1/markdown-it-attrs.browser.min.js`, `https://cdn.jsdelivr.net/npm/prismjs@latest/prism.min.js`],
+	category: `Formatting`,
+	description: `Renders markdown content into HTML with additional support for attributes and Prism syntax highlighting.`,
+	kind: `container`,
+	version: `1.0.0`,
+	docs: {
+	flags: {
+	keepTabs: `By default, tabs will be removed. Use this flag to leave tabs in.`
+},
+	content: [{
+	name: `content`,
+	type: `string`,
+	required: true,
+	description: `Markdown content to be rendered into HTML.`
+}],
+	examples: [{
+	payload: `{ }`,
+	template: `[markdown]# Header <br> **Bold Text** [/markdown]`,
+	output: `<h1>Header</h1> <p><strong>Bold Text</strong></p>`,
+	note: `Markdown content is converted to HTML.`
+}],
+	syntax: `[markdown] Your **markdown** text here [/markdown]`
+},
+	_md: null,
+	async onStartup() {
+		
+		const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+			
+		if (isNode) {
+			
+			const { default: MarkdownIt } = await import('markdown-it');
+			const { default: markdownItAttrs } = await import('markdown-it-attrs');
+			const { default: prism } = await import('markdown-it-prism');
+			
+			this._md = await MarkdownIt({ html: true })
+				.use(markdownItAttrs)
+				.use(prism);
+			
+		} else {
+			
+			// Will be called after all scripts are loaded!
+			this._md = window.markdownit()
+				.use(window.markdownItAttrs)
+			
+		}
+
+	},
+	onRender() {
+	
+		if (window.Prism && typeof window.Prism.highlightAll === 'function') {
+			window.Prism.highlightAll();
+		}
+		
+	},
+	processor(req) {
+		
+		if(!req.cargo?.flags?.includes('keepTabs')){
+			req.content = req.content.replace(/\t/g, '')
+		}
+		
+		let output = req.engine.process(req.content, req.payload)
+		
+		output = this._md.render(output)
+		
+		return output;
+		
+	},
+	variant: `alias`,
+	alias: `md`
 },
 	html_tag: {
 	name: `html_tag`,
@@ -4407,8 +4375,6 @@ export const plugins = {
 }],
 	processor(req) {
 		
-//		console.log('REQ::', req)
-		
 		let payload = {...req.payload}
 		
 		let iterable = req.params[0]
@@ -5781,7 +5747,6 @@ Welcome to our website!
 		
 		let template = `
 			
-			
 			[markdown]
 				
 				# [name] ([version])
@@ -5801,7 +5766,6 @@ Welcome to our website!
 				
 				## Syntax
 				[encode_delimiters: docs.syntax]
-				
 				
 				## Flags
 				
@@ -5838,10 +5802,10 @@ Welcome to our website!
 					[each: example using docs.examples]						
 						| Field         | Value      |
 						|---------------|------------|
-						| **Payload**          | [example.payload]         |
-						| **Template**          | [code][example.template][/code]         |
-						| **Output**          | [example.output]         |
-						| **Note**          | [example.note]         |
+						| **Payload**   | [example.payload]               |
+						| **Template**  | [code][example.template][/code] |
+						| **Output**    | [example.output]                |
+						| **Note**      | [example.note]                  |
 					[/each]  
 				[/if]
 				
