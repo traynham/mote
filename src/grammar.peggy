@@ -120,6 +120,15 @@
 		
 		return value
 	}
+
+	function resolveCoalesceValue(item) {
+		if (item && typeof item === 'object') {
+			if (Object.prototype.hasOwnProperty.call(item, 'value')) {
+				return item.value
+			}
+		}
+		return item
+	}
 	
 	function _evaluateCondition(condition, payload) {
 		
@@ -208,16 +217,37 @@ start "Start"
 	=	@(elements:expression+)
 
 expression "Expression"
-	=	@( text )
+	=	@( rawCodeElement )
+	/	@( text )
 	/	@( tag )
 	/	@( mal )
 	/	@( containerTag )
 	/	@( merge )
+	/	@( bracketText )
+
+rawCodeElement "Raw Code Element"
+	=	literal:$(scriptElement / styleElement)
+		{
+			return {
+				type: 'text',
+				value: literal,
+				text: literal,
+				render: literal
+			}
+		}
+
+scriptElement "Script Element"
+	=	"<script" (!">" .)* ">" (!"</script>" .)* "</script>"
+
+styleElement "Style Element"
+	=	"<style" (!">" .)* ">" (!"</style>" .)* "</style>"
 
 // MERGE
 merge "Merge Tag"
 
-	= tagName:merge_identifier
+	= ternary
+	/ coalesce
+	/ tagName:merge_identifier
 		&{ 
 			// only match if it's not a container tag *and* not a reserved word such as "else"
 			return !isContainer(tagName.value) 
@@ -249,11 +279,74 @@ merge "Merge Tag"
 
 		}
 
+coalesce "Coalesce"
+	= "[" _ head:coalesceTerm _ "||" _ tail:coalesceTerm rest:(_ "||" _ coalesceTerm)* _ "]" {
+			let values = [head, tail, ...rest.map(item => item[3])]
+			let resolved = values.map(item => resolveCoalesceValue(item))
+			let out = resolved[0]
+
+			for (let i = 1; i < resolved.length; i++) {
+				if (out) { break }
+				out = resolved[i]
+			}
+
+			return {
+				render: out,
+				text: text()
+			}
+		}
+
+ternary "Ternary"
+	= "[" _ cond:logicalOrExpression _ "?" _ truthy:coalesceTerm _ falsyPart:(_ ":" _ coalesceTerm)? _ "]" {
+			let condition = resolveCoalesceValue(cond)
+			let truthyValue = resolveCoalesceValue(truthy)
+			let falsyValue = falsyPart ? resolveCoalesceValue(falsyPart[3]) : ''
+			let out = condition ? truthyValue : falsyValue
+
+			return {
+				render: out,
+				text: text()
+			}
+		}
+
+coalesceTerm "Coalesce Term"
+	=	objectField
+	/	quotedText
+	/	boolean
+	/	number
+	/	nullLiteral
+	/	undefinedLiteral
+
+bracketText "Bracket Text"
+	=	literal:$("[" (bracketQuotedText / (!"]" .))* "]")
+		&{
+			const inner = literal.slice(1, -1).trim()
+			const match = inner.match(/^\/?([a-zA-Z_][a-zA-Z0-9_]*)/)
+
+			if (!match) { return true }
+
+			const name = match[1]
+			return !tags?.[name] && !MERGE_STOP_WORDS.has(name)
+		}
+		{
+			return {
+				type: 'text',
+				value: literal,
+				text: literal,
+				render: literal
+			}
+		}
+
+bracketQuotedText "Bracket Quoted Text"
+	=	'"' ( '\\"' / [^"] )* '"'
+	/	"'" ( "\\'" / [^'] )* "'"
+
 // MOVE TO SIGNATURE IDEA??
 merge_identifier "Merge Identifier"
-	=	"[" _ tagName:[a-zA-Z0-9._]* _ "]" {
-			debug('TRIGGER :: MERGE IDENTIFIER 1', tagName.join(''))
-			return { type: 'identifier', value: `${tagName.join('')}` } 
+	=	"[" _ head:[a-zA-Z_] tail:[a-zA-Z0-9._]* _ "]" {
+			const tagName = `${head}${tail.join('')}`
+			debug('TRIGGER :: MERGE IDENTIFIER 1', tagName)
+			return { type: 'identifier', value: tagName } 
 		}
 	
 	/	"[" _ tagName:objectField _ "]" {

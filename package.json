@@ -1,6 +1,6 @@
 {
-  "name": "textsynth",
-  "version": "1.0.0-beta.2",
+  "name": "mote",
+  "version": "1.0.0-beta.3",
   "description": "TextSynth is an extensible text templating engine with an intuitive syntax and built-in plugin support, enabling seamless merging and manipulation of data to generate dynamic content for various applications.",
   "main": "index.js",
   "type": "module",

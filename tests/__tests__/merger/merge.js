@@ -47,6 +47,73 @@ describe("merge", () => {
 		textSynth.options.removeTabs = true
 		expect(textSynth.merge(template, payload)).toBe('test template')
 	})
+
+	test("preserves bracketed text that is not a tag", () => {
+		const template = 'A recent title [Adapted as a movie] should render.'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
+
+	test("preserves multiple bracketed prose notes", () => {
+		const template = '[Book note] Title [Adapted as a movie]'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
+
+	test("preserves bracketed text that does not start with a tag-like name", () => {
+		const template = 'Edition [2026] and rating [*****]'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
+
+	test("still renders known merge tags outside raw code", () => {
+		const template = 'Before [text] after'
+		expect(textSynth.merge(template, payload)).toBe('Before    this is MY text    after')
+	})
+
+	test("preserves css attribute selectors", () => {
+		const template = 'a[href^="https://"] { color: rebeccapurple; }'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
+
+	test("preserves multiple css bracket selectors", () => {
+		const template = 'input[type="checkbox"]:checked + label[for="done"] { font-weight: bold; }'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
+
+	test("preserves bracketed text in css string values", () => {
+		const template = '.book::after { content: "[Adapted as a movie]"; }'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
+
+	test("preserves css bracket selectors while rendering tags", () => {
+		const template = '<style>[data-title="[Adapted as a movie]"] { display: block; }</style><p>[uppercase: text]</p>'
+		const expected = '<style>[data-title="[Adapted as a movie]"] { display: block; }</style><p>   THIS IS MY TEXT   </p>'
+		expect(textSynth.merge(template, payload)).toBe(expected)
+	})
+
+	test("preserves style tags with attributes as raw code", () => {
+		const template = '<style media="screen and (min-width: 40rem)">[data-count="1"] { --label: "[text]"; }</style>'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
+
+	test("preserves javascript arrays in script tags", () => {
+		const template = '<script>const values = [text, number, "literal"];</script>'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
+
+	test("preserves script tags with attributes as raw code", () => {
+		const template = '<script type="module">const template = `[text]`; const values = [1, 2, 3];</script>'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
+
+	test("preserves javascript bracket syntax while rendering tags outside scripts", () => {
+		const template = '<script>const [first] = items; const label = data["[Adapted as a movie]"];</script><p>[uppercase: text]</p>'
+		const expected = '<script>const [first] = items; const label = data["[Adapted as a movie]"];</script><p>   THIS IS MY TEXT   </p>'
+		expect(textSynth.merge(template, payload)).toBe(expected)
+	})
+
+	test("preserves javascript array literals that look like merge tags in scripts", () => {
+		const template = '<script>const selected = [text]; const keys = ["[text]", "[Adapted as a movie]"];</script>'
+		expect(textSynth.merge(template, payload)).toBe(template)
+	})
 	
 	// test("show bogus tags", () => {
 	// 	textSynth.showUndefinedTags = true

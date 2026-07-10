@@ -26,10 +26,10 @@ Mote (MOdular Template Engine, formerly TextSynth) is an extensible text templat
 
 ## Installation
 
-Install Mote using npm (package name remains `text-synth`):
+Install Mote using npm:
 
 ```bash
-npm install text-synth
+npm install mote
 ```
 
 ## Usage
@@ -39,7 +39,7 @@ npm install text-synth
 Import the Mote library and create a new instance:
 
 ```javascript
-import { Mote } from 'textsynth';
+import { Mote } from 'mote';
 
 const mote = await Mote();
 
@@ -56,7 +56,7 @@ console.log(output); // Output: Hello, World!
 Mote comes with built-in plugins that can be used to manipulate text within your templates:
 
 ```javascript
-import { Mote } from 'textsynth';
+import { Mote } from 'mote';
 
 const mote = await Mote();
 
@@ -73,7 +73,7 @@ console.log(output); // Output: Hello, WORLD!
 Create custom plugins to extend Mote's functionality:
 
 ```javascript
-import { Mote } from 'textsynth';
+import { Mote } from 'mote';
 
 const mote = await Mote();
 
@@ -99,7 +99,7 @@ Use Mote as a templating engine in your Express.js application:
 
 ```javascript
 import express from 'express';
-import { expressMote } from 'textsynth';
+import { expressMote } from 'mote';
 
 const app = express();
 const mote = await expressMote(app, {
