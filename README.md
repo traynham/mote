@@ -26,10 +26,13 @@ Mote (MOdular Template Engine, formerly TextSynth) is an extensible text templat
 
 ## Installation
 
-Install Mote using npm:
+Node.js 24 or newer is required. This beta is tested on Node.js 24.21.0.
+
+Until this project's npm package name is finalized, install from its GitHub
+repository. The registry package named `mote` currently belongs to another project.
 
 ```bash
-npm install mote
+npm install github:traynham/mote
 ```
 
 ## Usage
@@ -135,7 +138,18 @@ Mote can be customized using the following options:
 - `expressTextSynthEngine(filePath, options, callback)`: Low-level Express view engine (legacy name)
 - `mote.merge(template, data)`: Merges the template and data, returning the merged output
 - `mote.use(plugin)`: Adds a plugin to the Mote instance
-- `mote.renderFile(filePath, data, options)`: Renders a template file with the given data and options
+- `mote.mergeFile(filePath, data)`: Renders a template file with the given data
+
+## Beta.4 Migration
+
+Frontmatter now uses the maintained Eleventy gray-matter fork with YAML 4.
+YAML and JSON, dates, aliases, layouts, blocks, and Markdown are covered by
+regression tests. See [frontmatter migration notes](docs/frontmatter-migration.md)
+for indentation, numeric, binary, and JavaScript-frontmatter compatibility changes.
+
+Production dependencies have a clean npm audit. A development-only `sprintf-js`
+advisory remains through Jest's coverage tooling; do not use forced dependency
+downgrades to clear it. See [release notes](CHANGELOG.md).
 
 ## Contributing
 

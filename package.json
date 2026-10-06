@@ -1,7 +1,7 @@
 {
   "name": "mote",
-  "version": "1.0.0-beta.3",
-  "description": "TextSynth is an extensible text templating engine with an intuitive syntax and built-in plugin support, enabling seamless merging and manipulation of data to generate dynamic content for various applications.",
+  "version": "1.0.0-beta.4",
+  "description": "Mote is an extensible text templating engine with built-in plugins, YAML frontmatter, Markdown, layouts, and Express integration.",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -12,7 +12,8 @@
     "testv": "node --experimental-vm-modules node_modules/jest/bin/jest --verbose --config .jest.js",
     "express_example": "nodemon examples/express/index.js",
     "merge_docs": "./node_modules/.bin/jsdoc2md src/merger.js > docs/merger.md",
-    "build:grammar": "peggy --format es --output src/dist/grammar.js src/grammar.peggy"
+    "build:grammar": "peggy --format es --output src/dist/grammar.js src/grammar.peggy",
+    "smoke:package": "node scripts/smoke-package.mjs"
   },
   "files": [
     "index.js",
@@ -20,19 +21,27 @@
     "src/grammar.peggy",
     "src/plugins/**",
     "src/workers/**",
-    "src/dist/**"
+    "src/dist/engine.js",
+    "src/dist/grammar.js",
+    "src/dist/mote.js",
+    "src/dist/plugins.js",
+    "CHANGELOG.md",
+    "docs/frontmatter-migration.md"
   ],
   "author": "Jesse Traynham",
   "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
   "devDependencies": {
     "esbuild": "^0.25.5",
     "eslint": "^9.28.0",
-    "jest": "^29.7.0"
+    "jest": "^30.5.2"
   },
   "dependencies": {
+    "@11ty/gray-matter": "^2.1.0",
     "@jessetraynham/lorry": "^1.0.2",
     "express": "^5.1.0",
-    "gray-matter": "^4.0.3",
     "json-6": "^1.1.4",
     "markdown-it": "^14.1.0",
     "markdown-it-attrs": "^4.3.1",
@@ -43,6 +52,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/traynham/textsynth.git"
+    "url": "git+https://github.com/traynham/mote.git"
   }
 }

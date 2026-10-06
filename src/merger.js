@@ -5,7 +5,7 @@ import process from 'process'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
-import Matter from 'gray-matter'
+import Matter from '@11ty/gray-matter'
 import Lorry from '@jessetraynham/lorry'
 import * as peggy from "peggy"
 import { createSyncFn } from 'synckit'
